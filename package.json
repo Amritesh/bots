@@ -1,0 +1,25 @@
+{
+  "name": "bots",
+  "version": "1.0.0",
+  "description": "general purpose automation bots",
+  "main": "index.js",
+  "dependencies": {
+    "chrome-aws-lambda": "^5.2.1",
+    "puppeteer": "^5.2.1",
+    "puppeteer-core": "^5.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Amritesh/bots.git"
+  },
+  "author": "Amritesh Anand",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Amritesh/bots/issues"
+  },
+  "homepage": "https://github.com/Amritesh/bots#readme"
+}
