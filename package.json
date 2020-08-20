@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "chrome-aws-lambda": "^5.2.1",
+    "fs": "0.0.1-security",
     "puppeteer": "^5.2.1",
     "puppeteer-core": "^5.2.1"
   },

@@ -1,0 +1,8 @@
+{
+    "homeurl": "https://www.instagram.com/",
+    "tagurl": "https://www.instagram.com/explore/tags/",
+    "tags": ["sydneymums"],
+    "postLink": "https://www.instagram.com/p/",
+    "comments": ["Such a cute baby","Such a lovely Baby"],
+    "logFile": "./logs"
+}
