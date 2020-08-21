@@ -1,8 +1,9 @@
 {
     "homeurl": "https://www.instagram.com/",
     "tagurl": "https://www.instagram.com/explore/tags/",
-    "tags": ["sydneymums"],
+    "tags": ["indianbabies"],
     "postLink": "https://www.instagram.com/p/",
-    "comments": ["Such a cute baby","Such a lovely Baby"],
+    "comments": ["Your child is super cute and lovely. Please do like , comment and follow back and support each other little one 👶 on our latest 10 posts. I will randomly feature you in our story and also return favour. Also stay tune to enter our 3000 followers giveaway !😊. Stay tune dear."],
+    "totalComments": 100,
     "logFile": "./logs"
 }
