@@ -9,9 +9,9 @@ const fs = require('fs');
     const argv = yargs.argv;
     const run = argv._.includes('run');
     const halt = argv._.includes('halt');
-    let visitesPosts = [];
+    let visitedPosts = [];
     fs.readFile(config.logFile, 'utf-8', function (err, content) {
-        visitesPosts = content.split('\n');
+        visitedPosts = content.split('\n');
     });
     if (run) {
         const browser = await chromium.puppeteer.launch({
