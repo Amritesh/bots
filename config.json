@@ -1,9 +1,10 @@
 {
     "homeurl": "https://www.instagram.com/",
     "tagurl": "https://www.instagram.com/explore/tags/",
-    "tags": ["indianbabies"],
+    "tags": ["cutebabies"],
     "postLink": "https://www.instagram.com/p/",
     "comments": ["Your child is super cute and lovely. Please do like , comment and follow back and support each other little one 👶 on our latest 10 posts. I will randomly feature you in our story and also return favour. Also stay tune to enter our 3000 followers giveaway !😊. Stay tune dear."],
     "totalComments": 100,
+    "scrollCount": 50,
     "logFile": "./logs"
 }
