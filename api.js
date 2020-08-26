@@ -2,7 +2,7 @@ exports.autoScroll = async (page, scrollCount) => {
     return await page.evaluate(async ({scrollCount}) => {
         let allLinks = await new Promise((resolve, reject) => {
             let count = 0;
-            let distance = 1000;
+            let distance = 2000;
             let allLinks = [];
             const timer = setInterval(() => {
                 window.scrollBy(0, distance);

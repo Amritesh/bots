@@ -13,6 +13,7 @@ const fs = require('fs');
     fs.readFile(config.logFile, 'utf-8', function (err, content) {
         visitedPosts = content.split('\n').map(line=>line !== "" && JSON.parse(line)).filter(Boolean);
     });
+    const {tags, tagurl, comments, smileys} = config;
     if (run) {
         const browser = await chromium.puppeteer.launch({
             executablePath: await chromium.executablePath,
@@ -28,44 +29,44 @@ const fs = require('fs');
             await page.waitForSelector("div[role*='dialog']");
             const [button] = await page.$x("//button[contains(., 'Not Now')]");
             button && await button.click();
-            const comments = config.comments;
-            for (tag of config.tags) {
-                const tagspage = config.tagurl + tag;
-                await page.goto(tagspage, { waitUntil: 'networkidle2' });
-                const allLinks = await api.autoScroll(page,config.scrollCount);
-                const postLinkRE = new RegExp(config.postLink, "g");
-                let postLinks = allLinks.filter(link => link.match(postLinkRE));
-                let count = 0;
-                console.log("total Posts", postLinks.length);
-                for (postLink of postLinks) {
-                    try {
-                        if(!visitedPosts.find(post=>post.postLink === postLink)) {
-                            await page.goto(postLink, { waitUntil: 'networkidle2' });
-                            const [profileRef] = await page.$x("//button[contains(., 'Follow')]/../../div[1]/span/a");
-                            const profileLink = await page.evaluate(el => el.href, profileRef);
-                            await page.waitFor(Math.random()*1000);
-                            if(!visitedPosts.find(post=>post.profileLink === profileLink)){
-                                const post = {postLink, profileLink }
-                                const randomComment = comments[Math.floor(Math.random() * comments.length)];
-                                await page.type("textarea", randomComment);
-                                const [button] = await page.$x("//button[contains(., 'Post')]");
-                                await page.waitFor(Math.random()*10000);
-                                button && await button.click();
-                                visitedPosts.push(post);
-                                fs.appendFile(config.logFile,JSON.stringify(post)+"\n",()=>{});   
-                                count++;
-                            } else {
-                                console.log(`skipped ${profileLink}`);
-                            }
+            const tag = tags[Math.floor(Math.random() * tags.length)];
+            const tagspage = tagurl + tag;
+            await page.goto(tagspage, { waitUntil: 'networkidle2' });
+            const allLinks = await api.autoScroll(page,config.scrollCount);
+            const postLinkRE = new RegExp(config.postLink, "g");
+            let postLinks = allLinks.filter(link => link.match(postLinkRE));
+            let count = 0;
+            console.log("total Posts", postLinks.length);
+            for (postLink of postLinks) {
+                try {
+                    if(!visitedPosts.find(post=>post.postLink === postLink)) {
+                        await page.goto(postLink, { waitUntil: 'networkidle2' });
+                        const [profileRef] = await page.$x("//button[contains(., 'Follow')]/../../div[1]/span/a");
+                        const profileLink = await page.evaluate(el => el.href, profileRef);
+                        if(!visitedPosts.find(post=>post.profileLink === profileLink)){
+                            const post = {postLink, profileLink }
+                            const randomComment = comments[Math.floor(Math.random() * comments.length)];
+                            const smileyString = [0,1,2,3,4].map(_=>smileys[Math.floor(Math.random() * smileys.length)]).join('');
+                            const comment = randomComment.split(":smileys:").join(smileyString);
+                            await page.type("textarea", comment);
+                            const [button] = await page.$x("//button[contains(., 'Post')]");
+                            await page.waitFor(Math.random()*10000+10000);
+                            button && await button.click();
+                            await page.waitFor(Math.random()*10000+10000);
+                            visitedPosts.push(post);
+                            fs.appendFile(config.logFile,JSON.stringify(post)+"\n",()=>{});   
+                            count++;
                         } else {
-                            console.log(`skipped ${postLink}`);
+                            console.log(`skipped ${profileLink}`);
                         }
-                    } catch (e) {
-                        console.log(e, postLink);
+                    } else {
+                        console.log(`skipped ${postLink}`);
                     }
-                    if(count >= config.totalComments)
-                        break;
+                } catch (e) {
+                    console.log(e, postLink);
                 }
+                if(count >= config.totalComments)
+                    break;
             }
         } catch (error) {
             console.error(error);

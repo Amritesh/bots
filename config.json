@@ -1,10 +1,12 @@
 {
     "homeurl": "https://www.instagram.com/",
     "tagurl": "https://www.instagram.com/explore/tags/",
-    "tags": ["cutebabies"],
     "postLink": "https://www.instagram.com/p/",
-    "comments": ["Your child is super cute and lovely. Please do like , comment and follow back and support each other little one 👶 on our latest 10 posts. I will randomly feature you in our story and also return favour. Also stay tune to enter our 3000 followers giveaway !😊. Stay tune dear."],
-    "totalComments": 100,
-    "scrollCount": 50,
+    "tags": ["indianbabies", "babyboy", "babygirl", "newborn", "babiesofinstagram", "babies", "momandme", "cutebaby"],
+    "comments": ["Oh such a cutie pie. :smileys: Loved it. Do follow me and like, comment on recent 10 posts to support each other on our insta journey. ♥️ Would feature you in our story and return the favour. Stay tune dear."
+                ],
+    "smileys": ["😊", "🥰", "😇", "🙂", "🥳", "🤩", "🤗", "👼"],
+    "totalComments": 60,
+    "scrollCount": 10,
     "logFile": "./logs"
 }
