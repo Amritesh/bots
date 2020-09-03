@@ -1,27 +1,18 @@
-const secret = require('./secret');
-const api = require('./api');
-const yargs = require('yargs');
-const chromium = require('chrome-aws-lambda');
 const fs = require('fs');
-const {loginInsta, postComment} = require('./utils');
+const {initializeBrowser, loginInsta, scrollAndGetLinks, postComment} = require('./utils');
 exports.commentTags = async (config) => {
     let visitedPosts = [];
     fs.readFile(config.logFile, 'utf-8', function (err, content) {
         visitedPosts = content.split('\n').filter(Boolean).map(line=>JSON.parse(line));
     });
-    const browser = await chromium.puppeteer.launch({
-        executablePath: await chromium.executablePath,
-        headless: chromium.headless,
-        devtools: false
-    });
-    const page = (await browser.pages())[0];
-    await loginInsta(page, config, secret);
+    const {browser, page, posturl} = await initializeBrowser();
+    await loginInsta(page, config);
     const {tags, tagurl} = config;
-    const tagspage = tagurl + tags[Math.floor(Math.random() * tags.length)];
-    await page.goto(tagspage, { waitUntil: 'networkidle2' });
-    const allLinks = await api.autoScroll(page,config.scrollCount);
-    const postLinkRE = new RegExp(config.postLink, "g");
-    const postLinks = allLinks.filter(link => link.match(postLinkRE));
+    const tagpage = tagurl + tags[Math.floor(Math.random() * tags.length)];
+    await page.goto(tagpage, { waitUntil: 'networkidle2' });
+    const allLinks = await scrollAndGetLinks(page,config);
+    const posturlRE = new RegExp(posturl, "g");
+    const postLinks = allLinks.filter(link => link.match(posturlRE));
     let count = 0;
     console.log("Total Posts Found:", postLinks.length);
     for (postLink of postLinks) {
