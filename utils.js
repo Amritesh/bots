@@ -28,27 +28,28 @@ const clickNotNow = async (page) => {
 }
 
 exports.getFollowers = async (page, config) => {
-    const {posturl} = config;
+    const {posturl, scrollCount} = config;
     await page.waitForXPath("//a[contains(., 'followers')]");
     const [button] = await page.$x("//a[contains(., 'followers')]");
     button && await button.click();
     await page.waitForXPath("//div[@role='dialog']/div[1]/div[2]");
-    const allLinks = await scrollAndGetLinks(page, config, "div[role=dialog] div div:nth-child(2)");
+    const allLinks = await scrollAndGetLinks(page, scrollCount, "div[role=dialog] div div:nth-child(2)");
     const posturlRE = new RegExp(posturl, "g");
     return allLinks.filter(link => !link.match(posturlRE)).slice(40);
     
 }
 
 
-exports.getPostLinks = async (page, config) => {
-    const {posturl} = config;
-    const allLinks = await scrollAndGetLinks(page, config);
+exports.getPostLinks = async (page, config, noScroll) => {
+    let {posturl, scrollCount} = config;
+    noScroll && (scrollCount = 0);
+    const allLinks = await scrollAndGetLinks(page, scrollCount);
     const posturlRE = new RegExp(posturl, "g");
     return allLinks.filter(link => link.match(posturlRE));
 }
 
-const scrollAndGetLinks = async (page, config, selector) => {
-    return await page.evaluate(async ({scrollCount}, selector) => {
+const scrollAndGetLinks = async (page, scrollCount, selector) => {
+    return await page.evaluate(async (scrollCount, selector) => {
         let dom = window;
         selector && (dom = document.querySelector(selector));
         const allLinks = await new Promise((resolve, reject) => {
@@ -57,10 +58,10 @@ const scrollAndGetLinks = async (page, config, selector) => {
             let allLinks = [];
             const timer = setInterval(() => {
                 dom.scrollBy(0, distance);
-                count++;
                 const htmlCollection = document.getElementsByTagName('a');
                 const links = Array.prototype.slice.call( htmlCollection ).map(b=>b.href);
                 allLinks = Array.from(new Set([...allLinks, ...links]));
+                count++;
                 if(scrollCount<count){
                     clearInterval(timer);
                     resolve(allLinks);
@@ -68,10 +69,8 @@ const scrollAndGetLinks = async (page, config, selector) => {
             }, Math.random()*2000+2000);
         });
         return allLinks;
-    }, config, selector);
+    }, scrollCount, selector);
 }
-
-exports.scrollAndGetLinks = scrollAndGetLinks;
 
 exports.postComment = async (page,config) => {
     const comment = getComment(config);
@@ -85,13 +84,18 @@ exports.postComment = async (page,config) => {
 const getComment = (config) => {
     const {comments, smileys} = config;
     const randomComment = comments[Math.floor(Math.random() * comments.length)];
-    const smileyString = [0,1,2,3,4].map(_=>smileys[Math.floor(Math.random() * smileys.length)]).join('');
+    const smileyString = [0,1,2].map(_=>smileys[Math.floor(Math.random() * smileys.length)]).join('');
     return randomComment.split(":smileys:").join(smileyString);
 }
 
 exports.likePost = async (page) => {
-    await page.evaluate(async () => {
-        const [likeButton] = document.querySelectorAll("svg[aria-label='Like']");
+    await page.waitForSelector("svg");
+    const liked  = await page.evaluate(async () => {
+        const unLikeButton = document.querySelector("svg[aria-label='Unlike']");
+        if(unLikeButton) return false;
+        const likeButton = document.querySelector("svg[aria-label='Like']");
         likeButton && likeButton.parentElement.click(); 
-    });   
+        return true;
+    });
+    return liked;   
 }
