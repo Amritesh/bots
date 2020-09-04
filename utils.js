@@ -5,7 +5,7 @@ exports.initializeBrowser = async () =>{
     const browser = await chromium.puppeteer.launch({
         executablePath: await chromium.executablePath,
         headless: chromium.headless,
-        devtools: true
+        devtools: false
     });
     const page = (await browser.pages())[0];
     return {browser, page};
@@ -27,26 +27,38 @@ const clickNotNow = async (page) => {
     button && await button.click();
 }
 
-exports.getFollowers = async (page) => {
+exports.getFollowers = async (page, config) => {
+    const {posturl} = config;
     await page.waitForXPath("//a[contains(., 'followers')]");
     const [button] = await page.$x("//a[contains(., 'followers')]");
     button && await button.click();
     await page.waitForXPath("//div[@role='dialog']/div[1]/div[2]");
-    const [followrsDiv] = await page.$x("//div[@role='dialog']/div[1]/div[2]");
-    document.getElementById("d").scrollTop += 100;
-    return followers;
+    const allLinks = await scrollAndGetLinks(page, config, "div[role=dialog] div div:nth-child(2)");
+    const posturlRE = new RegExp(posturl, "g");
+    return allLinks.filter(link => !link.match(posturlRE)).slice(40);
+    
 }
 
-exports.scrollAndGetLinks = async (page, config, dom) => {
-    return await page.evaluate(async ({scrollCount}) => {
-        let allLinks = await new Promise((resolve, reject) => {
+
+exports.getPostLinks = async (page, config) => {
+    const {posturl} = config;
+    const allLinks = await scrollAndGetLinks(page, config);
+    const posturlRE = new RegExp(posturl, "g");
+    return allLinks.filter(link => link.match(posturlRE));
+}
+
+const scrollAndGetLinks = async (page, config, selector) => {
+    return await page.evaluate(async ({scrollCount}, selector) => {
+        let dom = window;
+        selector && (dom = document.querySelector(selector));
+        const allLinks = await new Promise((resolve, reject) => {
             let count = 0;
-            let distance = 2000;
+            const distance = 1000;
             let allLinks = [];
             const timer = setInterval(() => {
-                window.scrollBy(0, distance);
+                dom.scrollBy(0, distance);
                 count++;
-                const htmlCollection = document.getElementsByTagName('a')
+                const htmlCollection = document.getElementsByTagName('a');
                 const links = Array.prototype.slice.call( htmlCollection ).map(b=>b.href);
                 allLinks = Array.from(new Set([...allLinks, ...links]));
                 if(scrollCount<count){
@@ -56,10 +68,12 @@ exports.scrollAndGetLinks = async (page, config, dom) => {
             }, Math.random()*2000+2000);
         });
         return allLinks;
-    }, config);
+    }, config, selector);
 }
 
-exports.postComment = async (page) => {
+exports.scrollAndGetLinks = scrollAndGetLinks;
+
+exports.postComment = async (page,config) => {
     const comment = getComment(config);
     await page.type("textarea", comment);
     const [button] = await page.$x("//button[contains(., 'Post')]");
@@ -73,4 +87,11 @@ const getComment = (config) => {
     const randomComment = comments[Math.floor(Math.random() * comments.length)];
     const smileyString = [0,1,2,3,4].map(_=>smileys[Math.floor(Math.random() * smileys.length)]).join('');
     return randomComment.split(":smileys:").join(smileyString);
+}
+
+exports.likePost = async (page) => {
+    await page.evaluate(async () => {
+        const [likeButton] = document.querySelectorAll("svg[aria-label='Like']");
+        likeButton && likeButton.parentElement.click(); 
+    });   
 }

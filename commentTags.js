@@ -1,18 +1,16 @@
 const fs = require('fs');
-const {initializeBrowser, loginInsta, scrollAndGetLinks, postComment} = require('./utils');
+const {initializeBrowser, loginInsta, getPostLinks, postComment} = require('./utils');
 exports.commentTags = async (config) => {
     let visitedPosts = [];
     fs.readFile(config.logFile, 'utf-8', function (err, content) {
         visitedPosts = content.split('\n').filter(Boolean).map(line=>JSON.parse(line));
     });
-    const {browser, page, posturl} = await initializeBrowser();
+    const {browser, page} = await initializeBrowser();
     await loginInsta(page, config);
     const {tags, tagurl} = config;
     const tagpage = tagurl + tags[Math.floor(Math.random() * tags.length)];
     await page.goto(tagpage, { waitUntil: 'networkidle2' });
-    const allLinks = await scrollAndGetLinks(page,config);
-    const posturlRE = new RegExp(posturl, "g");
-    const postLinks = allLinks.filter(link => link.match(posturlRE));
+    const postLinks = await getPostLinks(page, config);
     let count = 0;
     console.log("Total Posts Found:", postLinks.length);
     for (postLink of postLinks) {
