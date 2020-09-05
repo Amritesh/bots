@@ -153,7 +153,9 @@ const commentOnPosts = async (page, postLinks) => {
     console.log("Total Posts Found:", postLinks.length);
     for (postLink of postLinks) {
         try {
-            count += await commentOnPost(page, postLink, visitedPosts);
+            if(!page.isClosed()){
+                count += await commentOnPost(page, postLink, visitedPosts);
+            }
         } catch (e) { console.log(e, postLink); }
         if (count >= totalComments) break;
     }
@@ -207,7 +209,9 @@ const likePostsOfProfiles = async (page, profileLinks) => {
     console.log("Total Profiles Found:", profileLinks.length);
     for (profileLink of profileLinks) {
         try {
-            count += await likePostsOfProfile(page, profileLink, visitedPosts);
+            if(!page.isClosed()){
+                count += await likePostsOfProfile(page, profileLink, visitedPosts);
+            }
         } catch (e) {
             console.log(e, profileLink);
         }
