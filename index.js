@@ -1,9 +1,30 @@
-const config = require('./config');
 const yargs = require('yargs');
-const {commentTags} = require('./commentTags');
-const {likePosts} = require('./likePosts');
+const { initializeBrowser, loginInsta, openTagPage, openProfilePage, getPostLinks, commentOnPosts, getFollowers, getPostLikes, likePostsOfProfiles } = require('./utils');
+
+const runAutomation = async (type) => {
+    const { browser, page } = await initializeBrowser();
+    await loginInsta(page);
+    if (type === "commentTags") {
+        await openTagPage(page);
+        const postLinks = await getPostLinks(page);
+        await commentOnPosts(page, postLinks);
+    } else if (type === "likeFollowers") {
+        await openProfilePage(page);
+        const profileLinks = await getFollowers(page);
+        await likePostsOfProfiles(page, profileLinks);
+    } else if (type === "likePostLikes"){
+        await openProfilePage(page);
+        const postLinks = await getPostLinks(page, true);
+        for(postLink of postLinks){
+            const profileLinks = await getPostLikes(page, postLink);
+            await likePostsOfProfiles(page, profileLinks);
+        }
+    }
+    await browser.close();
+};
+
 (async () => {
-    const argv = yargs.argv;
-    if(argv._.includes('commentTags')) await commentTags(config);
-    if(argv._.includes('likePosts')) await likePosts(config);
+    for (type of yargs.argv._) {
+        await runAutomation(type);
+    }
 })();

@@ -9,5 +9,6 @@
     "scrollCount": 10,
     "totalComments": 150,
     "totalLikes": 500,
-    "profiles": ["sonal_ayaansh"]
+    "recentPostsLimit": 12,
+    "profile": "sonal_ayaansh"
 }
