@@ -164,11 +164,11 @@ const commentOnPosts = async (page, postLinks) => {
 
 const likePost = async (page) => {
     await page.waitForSelector("svg");
+    await page.waitFor(Math.random() * 5000 + 5000);
     const liked = await page.evaluate(async () => {
         const unLikeButton = document.querySelector("svg[aria-label='Unlike']");
         if (unLikeButton) return false;
         const likeButton = document.querySelector("svg[aria-label='Like']");
-        await page.waitFor(Math.random() * 5000 + 5000);
         likeButton && likeButton.parentElement.click();
         return true;
     });
