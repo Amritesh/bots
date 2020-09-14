@@ -168,6 +168,7 @@ const likePost = async (page) => {
         const unLikeButton = document.querySelector("svg[aria-label='Unlike']");
         if (unLikeButton) return false;
         const likeButton = document.querySelector("svg[aria-label='Like']");
+        await page.waitFor(Math.random() * 5000 + 5000);
         likeButton && likeButton.parentElement.click();
         return true;
     });
