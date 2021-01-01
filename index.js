@@ -19,6 +19,10 @@ const runAutomation = async (type) => {
             const profileLinks = await getPostLikes(page, postLink);
             await likePostsOfProfiles(page, profileLinks);
         }
+    } else if(type === "likeCommentFollowers"){
+        await openProfilePage(page);
+        const profileLinks = await getFollowers(page);
+        await likePostsOfProfiles(page, profileLinks, true);
     }
     await browser.close();
 };

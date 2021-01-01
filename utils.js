@@ -175,7 +175,7 @@ const likePost = async (page) => {
     return liked;
 }
 
-const likePostsOfProfile = async (page, profileLink, visitedPosts) => {
+const likePostsOfProfile = async (page, profileLink, visitedPosts, comment) => {
     const { recentPostsLimit, logFile } = config;
     let count = 0;
     console.log("Visiting profile", profileLink);
@@ -191,6 +191,7 @@ const likePostsOfProfile = async (page, profileLink, visitedPosts) => {
             if (liked) {
                 console.log(`Liked ${postLink}`);
                 visitedPosts.push(post);
+                comment && commentOnPost(page, postLink, visitedPosts);
                 fs.appendFile(logFile, JSON.stringify(post) + "\n", () => {});
                 count++;
             } else {
@@ -203,7 +204,7 @@ const likePostsOfProfile = async (page, profileLink, visitedPosts) => {
     return count;
 }
 
-const likePostsOfProfiles = async (page, profileLinks) => {
+const likePostsOfProfiles = async (page, profileLinks, comment) => {
     const { totalLikes } = config;
     const visitedPosts = getVisitedPosts();
     let count = 0;
@@ -211,7 +212,7 @@ const likePostsOfProfiles = async (page, profileLinks) => {
     for (profileLink of profileLinks) {
         try {
             if(!page.isClosed()){
-                count += await likePostsOfProfile(page, profileLink, visitedPosts);
+                count += await likePostsOfProfile(page, profileLink, visitedPosts, comment);
             }
         } catch (e) {
             console.log(e, profileLink);
@@ -220,5 +221,6 @@ const likePostsOfProfiles = async (page, profileLinks) => {
     }
     console.log(`Total Liked: ${count}`);
 }
+
 
 module.exports = { initializeBrowser, loginInsta, openTagPage, openProfilePage, getFollowers, getPostLinks, commentOnPosts, likePostsOfProfiles, getPostLikes } 
