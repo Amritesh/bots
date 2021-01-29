@@ -230,9 +230,9 @@ const shareMessageToProfile = async (browser, page, profileLink) => {
         await page.waitFor(Math.random() * 1000 + 1000);
         const [textarea] = await page.$x("//textarea");
         await page.type("textarea", message);
-        await page.waitFor(Math.random() * 1000 + 10000);
-        const [button] = await page.$x("//button[contains(., 'Send')]");
-        button && await button.click();
+        await page.waitFor(Math.random() * 1000 + 1000);
+        const [send] = await page.$x("//button[contains(., 'Send')]");
+        send && await send.click();
         await page.waitFor(Math.random() * 2000 + 2000);
         return 1;
     } else{
