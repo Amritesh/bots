@@ -221,4 +221,38 @@ const likePostsOfProfiles = async (page, profileLinks) => {
     console.log(`Total Liked: ${count}`);
 }
 
-module.exports = { initializeBrowser, loginInsta, openTagPage, openProfilePage, getFollowers, getPostLinks, commentOnPosts, likePostsOfProfiles, getPostLikes } 
+const shareMessageToProfile = async (browser, page, profileLink) => {
+    const { message} = config;
+    await page.goto(profileLink, { waitUntil: 'networkidle2' });
+    const [button] = await page.$x("//button[contains(., 'Message')]");
+    if(button){
+        await button.click();
+        await page.waitFor(Math.random() * 1000 + 1000);
+        const [textarea] = await page.$x("//textarea");
+        await page.type("textarea", message);
+        await page.waitFor(Math.random() * 1000 + 10000);
+        const [button] = await page.$x("//button[contains(., 'Send')]");
+        button && await button.click();
+        await page.waitFor(Math.random() * 2000 + 2000);
+        return 1;
+    } else{
+        return 0;
+    }
+}
+
+const shareMessageToProfiles = async (browser, page, profileLinks) => {
+    let count = 0;
+    console.log("Total Profiles Found:", profileLinks.length);
+    for (profileLink of profileLinks) {
+        try {
+            if(!page.isClosed()){
+                count += await shareMessageToProfile(browser, page, profileLink);
+            }
+        } catch (e) {
+            console.log(e, profileLink);
+        }
+    }
+    console.log(`Total Messages shared: ${count}`);
+}
+
+module.exports = { initializeBrowser, loginInsta, openTagPage, openProfilePage, getFollowers, getPostLinks, commentOnPosts, likePostsOfProfiles, getPostLikes, shareMessageToProfiles } 
