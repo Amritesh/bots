@@ -1,14 +1,21 @@
 const secret = require('./secret');
-const chromium = require('chrome-aws-lambda');
+
+var path = require('path');
+if (process.pkg) {
+    var puppeteer = require(path.resolve(process.cwd(), 'puppeteer'));
+} else {
+    var puppeteer = require('puppeteer')
+};
 const config = require('./config');
 const fs = require('fs');
 
 const initializeBrowser = async () => {
-    const browser = await chromium.puppeteer.launch({
-        executablePath: await chromium.executablePath,
-        headless: chromium.headless,
+    const browser = await puppeteer.launch({
+        // executablePath: await chromium.executablePath,
+        headless: false,
         devtools: false
     });
+    console.log(browser);
     const page = (await browser.pages())[0];
     return { browser, page };
 }
@@ -22,6 +29,11 @@ const loginInsta = async (page) => {
     await page.click('[type="submit"]');
     await clickNotNow(page);
     await clickNotNow(page);
+}
+
+const promptloginInsta = async (page) =>{
+    const { homeurl } = config;
+    await page.goto(homeurl, { waitUntil: 'networkidle2' });
 }
 
 const clickNotNow = async (page) => {
@@ -51,7 +63,7 @@ const getDialogLinks = async (page, selector) => {
 }
 
 const getFollowers = async (page) => {
-    await page.waitForXPath("//a[contains(., 'followers')]");
+    await page.waitForXPath("//a[contains(., 'followers')]",{timeout: 0});
     const [button] = await page.$x("//a[contains(., 'followers')]");
     button && await button.click();
     return await getDialogLinks(page, "div[role=dialog] div div:nth-child(2)");
@@ -118,9 +130,9 @@ const postComment = async (page) => {
     const comment = getComment();
     await page.type("textarea", comment);
     const [button] = await page.$x("//button[contains(., 'Post')]");
-    await page.waitFor(Math.random() * 1000 + 1000);
+    await page.waitFor(Math.random() * 1000 + 10000);
     button && await button.click();
-    await page.waitFor(Math.random() * 2000 + 2000);
+    await page.waitFor(Math.random() * 2000 + 5000);
 }
 
 const commentOnPost = async (page, postLink, visitedPosts) => {
@@ -164,7 +176,7 @@ const commentOnPosts = async (page, postLinks) => {
 
 const likePost = async (page) => {
     await page.waitForSelector("svg");
-    await page.waitFor(Math.random() * 5000 + 5000);
+    await page.waitFor(Math.random() * 5000 + 10000);
     const liked = await page.evaluate(async () => {
         const unLikeButton = document.querySelector("svg[aria-label='Unlike']");
         if (unLikeButton) return false;
@@ -230,7 +242,7 @@ const shareMessageToProfile = async (browser, page, profileLink) => {
         await page.waitFor(Math.random() * 1000 + 1000);
         const [textarea] = await page.$x("//textarea");
         await page.type("textarea", message);
-        await page.waitFor(Math.random() * 1000 + 1000);
+        await page.waitFor(Math.random() * 1000 + 10000);
         const [send] = await page.$x("//button[contains(., 'Send')]");
         send && await send.click();
         await page.waitFor(Math.random() * 2000 + 2000);
@@ -255,4 +267,6 @@ const shareMessageToProfiles = async (browser, page, profileLinks) => {
     console.log(`Total Messages shared: ${count}`);
 }
 
-module.exports = { initializeBrowser, loginInsta, openTagPage, openProfilePage, getFollowers, getPostLinks, commentOnPosts, likePostsOfProfiles, getPostLikes, shareMessageToProfiles } 
+module.exports = { initializeBrowser, loginInsta, openTagPage, openProfilePage, getFollowers, 
+    getPostLinks, commentOnPosts, likePostsOfProfiles, getPostLikes, shareMessageToProfiles,
+    promptloginInsta } 

@@ -3,13 +3,13 @@
     "homeurl": "https://www.instagram.com/",
     "posturl": "https://www.instagram.com/p/",
     "tagurl": "https://www.instagram.com/explore/tags/",
-    "tags": ["indianbabies", "babyboy", "babygirl", "newborn", "babiesofinstagram", "babies", "momandme", "cutebaby"],
-    "comments": ["Such a cute pic. :smileys: Loved it. Do follow me and like, comment on recent 10 posts to support each other on our insta journey. ♥️ Would feature you in our story and return the favour. Stay tune dear."],
+    "tags": ["indianbabygirl"],
+    "comments": ["this is so nice :smileys:Lets support Each other. follow,like and comment on my 10 recent posts and I will return the favour or will give a shout-out on my story."],
     "smileys": ["😊", "🥰", "😇", "🙂", "🥳", "🤩", "🤗", "👼"],
-    "scrollCount": 10,
-    "totalComments": 150,
-    "totalLikes": 500,
-    "recentPostsLimit": 12,
+    "scrollCount": 25,
+    "totalComments": 60,
+    "totalLikes": 700,
+    "recentPostsLimit": 10,
     "profile": "sonal_ayaansh",
-    "message": "Please ignore I was doing some testing."
+    "comment" : "This is really nice. "
 }
