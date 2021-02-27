@@ -1,5 +1,6 @@
 const yargs = require('yargs');
-const { initializeBrowser, loginInsta, openTagPage, openProfilePage, getPostLinks, commentOnPosts, getFollowers, getPostLikes, likePostsOfProfiles } = require('./utils');
+const { initializeBrowser, loginInsta, openTagPage, openProfilePage, getPostLinks, commentOnPosts, 
+    getFollowers, getPostLikes, likePostsOfProfiles, shareMessageToProfiles } = require('./utils');
 
 const runAutomation = async (type) => {
     const { browser, page } = await initializeBrowser();
@@ -23,6 +24,10 @@ const runAutomation = async (type) => {
         await openProfilePage(page);
         const profileLinks = await getFollowers(page);
         await likePostsOfProfiles(page, profileLinks, true);
+    } else if (type === "shareMessage") {
+        await openProfilePage(page);
+        const profileLinks = await getFollowers(page);
+        await shareMessageToProfiles(browser, page, profileLinks);
     }
     await browser.close();
 };
