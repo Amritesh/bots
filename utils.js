@@ -119,15 +119,15 @@ const getVisitedPosts = () => {
     return visitedPosts;
 }
 
-const getComment = () => {
+const getComment = (index) => {
     const { comments, smileys } = config;
-    const randomComment = comments[Math.floor(Math.random() * comments.length)];
+    const comment = comments[index];
     const smileyString = [0, 1, 2].map(_ => smileys[Math.floor(Math.random() * smileys.length)]).join('');
-    return randomComment.split(":smileys:").join(smileyString);
+    return comment.split(":smileys:").join(smileyString);
 }
 
-const postComment = async (page) => {
-    const comment = getComment();
+const postComment = async (page, index) => {
+    const comment = getComment(index);
     await page.type("textarea", comment);
     const [button] = await page.$x("//button[contains(., 'Post')]");
     await page.waitFor(Math.random() * 1000 + 10000);
@@ -135,7 +135,7 @@ const postComment = async (page) => {
     await page.waitFor(Math.random() * 2000 + 5000);
 }
 
-const commentOnPost = async (page, postLink, visitedPosts) => {
+const commentOnPost = async (page, postLink, visitedPosts, index=0) => {
     const { logFile } = config;
     let count = 0;
     if (!visitedPosts.find(post => post.postLink === postLink)) {
@@ -144,7 +144,7 @@ const commentOnPost = async (page, postLink, visitedPosts) => {
         const profileLink = await page.evaluate(el => el.href, profileRef);
         if (!visitedPosts.find(post => post.profileLink === profileLink)) {
             const post = { postLink, profileLink };
-            await postComment(page);
+            await postComment(page, index);
             console.log(`Posted ${postLink}`);
             visitedPosts.push(post);
             fs.appendFile(logFile, JSON.stringify(post) + "\n", () => {});
@@ -187,14 +187,15 @@ const likePost = async (page) => {
     return liked;
 }
 
-const likePostsOfProfile = async (page, profileLink, visitedPosts) => {
-    const { recentPostsLimit, logFile } = config;
+const likePostsOfProfile = async (page, profileLink, visitedPosts, comment) => {
+    const { recentPostsLimit, logFile, comments } = config;
     let count = 0;
     console.log("Visiting profile", profileLink);
     await page.goto(profileLink, { waitUntil: 'networkidle2' });
     let postLinks = await getPostLinks(page, true);
     postLinks = postLinks.slice(0, recentPostsLimit);
     console.log("Total Posts Found:", postLinks.length);
+    comment && (postLinks = postLinks.slice(0, comments.length));
     for (postLink of postLinks) {
         if (!visitedPosts.find(post => post.postLink === postLink)) {
             await page.goto(postLink, { waitUntil: 'networkidle2' });
@@ -203,7 +204,8 @@ const likePostsOfProfile = async (page, profileLink, visitedPosts) => {
             if (liked) {
                 console.log(`Liked ${postLink}`);
                 visitedPosts.push(post);
-                fs.appendFile(logFile, JSON.stringify(post) + "\n", () => {});
+                comment && commentOnPost(page, postLink, visitedPosts, count);
+                !comment && fs.appendFile(logFile, JSON.stringify(post) + "\n", () => {});
                 count++;
             } else {
                 console.log(`Skipped ${postLink} already liked.`);
@@ -215,7 +217,7 @@ const likePostsOfProfile = async (page, profileLink, visitedPosts) => {
     return count;
 }
 
-const likePostsOfProfiles = async (page, profileLinks) => {
+const likePostsOfProfiles = async (page, profileLinks, comment) => {
     const { totalLikes } = config;
     const visitedPosts = getVisitedPosts();
     let count = 0;
@@ -223,7 +225,7 @@ const likePostsOfProfiles = async (page, profileLinks) => {
     for (profileLink of profileLinks) {
         try {
             if(!page.isClosed()){
-                count += await likePostsOfProfile(page, profileLink, visitedPosts);
+                count += await likePostsOfProfile(page, profileLink, visitedPosts, comment);
             }
         } catch (e) {
             console.log(e, profileLink);

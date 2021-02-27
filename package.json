@@ -7,7 +7,8 @@
     "chrome-aws-lambda": "^5.2.1",
     "fs": "0.0.1-security",
     "puppeteer": "^5.2.1",
-    "puppeteer-core": "^5.2.1"
+    "puppeteer-core": "^5.2.1",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {},
   "scripts": {
