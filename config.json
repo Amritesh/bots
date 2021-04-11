@@ -4,12 +4,12 @@
     "posturl": "https://www.instagram.com/p/",
     "tagurl": "https://www.instagram.com/explore/tags/",
     "tags": ["indianbabygirl"],
-    "comments": ["this is so nice :smileys:Lets support Each other. follow,like and comment on my 10 recent posts and I will return the favour or will give a shout-out on my story."],
+    "comments": ["This is nice :smileys:","liked it 😇", "😊 Adorable", "🙂"],
     "smileys": ["😊", "🥰", "😇", "🙂", "🥳", "🤩", "🤗", "👼"],
-    "scrollCount": 25,
-    "totalComments": 60,
-    "totalLikes": 700,
-    "recentPostsLimit": 10,
+    "scrollCount":30,
+    "totalComments": 30,
+    "totalLikes": 30,
+    "recentPostsLimit": 5,
     "profile": "sonal_ayaansh",
     "comment" : "This is really nice. "
 }

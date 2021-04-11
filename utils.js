@@ -128,11 +128,12 @@ const getComment = (index) => {
 
 const postComment = async (page, index) => {
     const comment = getComment(index);
+    await page.waitFor(Math.random() * 10000 + 10000);
     await page.type("textarea", comment);
     const [button] = await page.$x("//button[contains(., 'Post')]");
-    await page.waitFor(Math.random() * 1000 + 10000);
+    await page.waitFor(Math.random() * 10000 + 10000);
     button && await button.click();
-    await page.waitFor(Math.random() * 2000 + 5000);
+    await page.waitFor(Math.random() * 10000 + 10000);
 }
 
 const commentOnPost = async (page, postLink, visitedPosts, index=0) => {
@@ -176,7 +177,7 @@ const commentOnPosts = async (page, postLinks) => {
 
 const likePost = async (page) => {
     await page.waitForSelector("svg");
-    await page.waitFor(Math.random() * 5000 + 10000);
+    await page.waitFor(Math.random() * 10000 + 10000);
     const liked = await page.evaluate(async () => {
         const unLikeButton = document.querySelector("svg[aria-label='Unlike']");
         if (unLikeButton) return false;
@@ -184,6 +185,7 @@ const likePost = async (page) => {
         likeButton && likeButton.parentElement.click();
         return true;
     });
+    await page.waitFor(Math.random() * 10000 + 10000);
     return liked;
 }
 
@@ -203,7 +205,7 @@ const likePostsOfProfile = async (page, profileLink, visitedPosts, comment) => {
             const liked = await likePost(page);
             if (liked) {
                 console.log(`Liked ${postLink}`);
-                visitedPosts.push(post);
+                !comment && visitedPosts.push(post);
                 comment && commentOnPost(page, postLink, visitedPosts, count);
                 !comment && fs.appendFile(logFile, JSON.stringify(post) + "\n", () => {});
                 count++;

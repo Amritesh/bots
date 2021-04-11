@@ -7,12 +7,12 @@ const runAutomation = async (type, slice) => {
     await loginInsta(page);
     if (type === 1) {
         await openTagPage(page);
-        const postLinks = await getPostLinks(page);
+        let postLinks = await getPostLinks(page);
         postLinks = postLinks.slice(...slice);
         await commentOnPosts(page, postLinks);
     } else if (type === 2) {
         await openProfilePage(page);
-        const profileLinks = await getFollowers(page);
+        let profileLinks = await getFollowers(page);
         profileLinks = profileLinks.slice(...slice);
         await likePostsOfProfiles(page, profileLinks);
     } else if (type === 3){
@@ -24,8 +24,8 @@ const runAutomation = async (type, slice) => {
         }
     } else if(type === 4){
         await openProfilePage(page);
-        const profileLinks = await getFollowers(page);
-        rofileLinks = profileLinks.slice(...slice);
+        let profileLinks = await getFollowers(page);
+        profileLinks = profileLinks.slice(...slice);
         await likePostsOfProfiles(page, profileLinks, true);
     } else if (type === 5) {
         await openProfilePage(page);
