@@ -1,8 +1,8 @@
 const yargs = require('yargs');
 const { initializeBrowser, loginInsta, openTagPage, openProfilePage, getPostLinks, commentOnPosts, 
-    getFollowers, getPostLikes, likePostsOfProfiles, shareMessageToProfiles } = require('./utils');
+    getFollowers, getPostLikes, likePostsOfProfiles, shareMessageToProfiles, likeEngageGroup } = require('./utils');
 
-const runAutomation = async (type, slice) => {
+const runAutomation = async (type, slice, index) => {
     const { browser, page } = await initializeBrowser();
     await loginInsta(page);
     if (type === 1) {
@@ -31,6 +31,8 @@ const runAutomation = async (type, slice) => {
         await openProfilePage(page);
         const profileLinks = await getFollowers(page);
         await shareMessageToProfiles(browser, page, profileLinks);
+    } else if(type === 6) {
+        await likeEngageGroup(page,index);
     }
     await browser.close();
 };
@@ -39,18 +41,20 @@ const runAutomation = async (type, slice) => {
     const argv = yargs
         .options({
             'a': { 
-                choices: [1,2,3,4,5],array: true, default: [], number: true,
+                array: true, default: [], number: true,
                 describe: `Run Automations: 
                 1. commentTags.
                 2. likeFollowers.
                 3. likePostLikes,
                 4. likeCommentFollowers,
-                5. shareMessage`
+                5. shareMessage,
+                6. likeEngageGroup`
             },
+            'índex': {number: true},
             'slice': { default: [0], array: true, describe: `Use this option to process only a part. Usage --slice 10 20 to process from 10th to 19th item.`, number: true}
         }).argv;
     console.log(argv);
     for (type of yargs.argv.a) {
-        await runAutomation(type,yargs.argv.slice);
+        await runAutomation(type,yargs.argv.slice, yargs.argv.índex);
     }
 })();
