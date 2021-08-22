@@ -54,6 +54,19 @@ const openProfilePage = async (page) => {
     await page.goto(profilePage, { waitUntil: 'networkidle2' });
 }
 
+const openGroupPage = async (page, index=0) => {
+    const { engageGroup, homeurl } = config;
+    const profile = engageGroup[index];
+    const profilePage = homeurl + profile + '/tagged/';
+    await page.goto(profilePage, { waitUntil: 'networkidle2' });
+}
+
+const likeEngageGroup = async (page, index=0) => {
+    const { engageGroup, homeurl } = config;
+    const profileLinks = [`${homeurl}${engageGroup[index]}/tagged`];
+    await likePostsOfProfiles(page, profileLinks);
+}
+
 const getDialogLinks = async (page, selector) => {
     const { scrollCount } = config;
     await page.waitForSelector(selector);
@@ -185,7 +198,7 @@ const likePost = async (page) => {
         likeButton && likeButton.parentElement.click();
         return true;
     });
-    await page.waitFor(Math.random() * 10000 + 10000);
+    await page.waitFor(Math.random() * 2000 + 5000);
     return liked;
 }
 
@@ -194,7 +207,7 @@ const likePostsOfProfile = async (page, profileLink, visitedPosts, comment) => {
     let count = 0;
     console.log("Visiting profile", profileLink);
     await page.goto(profileLink, { waitUntil: 'networkidle2' });
-    let postLinks = await getPostLinks(page, true);
+    let postLinks = await getPostLinks(page, false);
     postLinks = postLinks.slice(0, recentPostsLimit);
     console.log("Total Posts Found:", postLinks.length);
     comment && (postLinks = postLinks.slice(0, comments.length));
@@ -273,4 +286,4 @@ const shareMessageToProfiles = async (browser, page, profileLinks) => {
 
 module.exports = { initializeBrowser, loginInsta, openTagPage, openProfilePage, getFollowers, 
     getPostLinks, commentOnPosts, likePostsOfProfiles, getPostLikes, shareMessageToProfiles,
-    promptloginInsta } 
+    promptloginInsta, likeEngageGroup } 
